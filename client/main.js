@@ -22,20 +22,26 @@ Template.nba.events({
 	var request = new Request("https://www.reddit.com/r/nbastreams/top/.json");
 	fetch(request).then(function(response) {
   		return response.text();
-	}).then(function(text) {
+	}).then(function(response_text) {
+		// TODO(jjffryan): find the link to open
+		var response_json = JSON.parse(response_text);
+		// var commentURL = response_json.data.children[0].data.url + "comments/.json"
+		// (example link)
+		var link = "http://buffstream.live/tv/watch-hbo-live-streaming.php"
+		var commentRequest = new Request(link);
 
-		var obj = JSON.parse(text);
-		var commentURL = obj.data.children[0].data.url + "comments/.json"
-
-		var commentRequest = new Request(commentURL);
-		console.log(commentURL);
-
+		// TODO(acejang1994, thomasaeyo): open (redirect) the video
 		fetch(commentRequest).then(function(response) {
 	  		return response.text();
 		}).then(function(text) {
 			var firstPostComments = JSON.parse(text);
+			console.log("firstPostComments: ", firstPostComments); 
 			var body = firstPostComments[1].data.children[2].data.body;
-			instance.variable.set(body.substring(body.indexOf("(") +1, body.indexOf(")")));
+			var variable = body.substring(body.indexOf("(") +1, body.indexOf(")"));
+			console.log("variable: ", variable); 
+			instance.variable.set(variable);
+		}).catch(function(error) {
+			console.log("Caught error");
 		});
 	});
   },
